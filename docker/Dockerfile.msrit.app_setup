@@ -1,0 +1,34 @@
+#
+# NodeJS APP Docker Container
+#
+FROM docker_ubuntu_base 
+MAINTAINER Geeth Chowdary "geeth@geethsoft.com"
+
+RUN apt install git -y
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && \
+	sudo apt-get install -y nodejs
+
+
+RUN npm install -g @angular/cli
+RUN npm install -g forever
+ARG GIT_PROJECT_NAME
+ARG GIT_BRANCH
+ARG GIT_SERVER_URL
+ARG GIT_PROJECT_GROUP
+RUN mkdir -p /app/$GIT_PROJECT_NAME
+WORKDIR /app/$GIT_PROJECT_NAME
+RUN git init && \
+    git remote add origin $GIT_SERVER_URL/$GIT_PROJECT_GROUP/$GIT_PROJECT_NAME.git && \
+    git fetch origin $GIT_BRANCH && \
+    git checkout $GIT_BRANCH 
+
+#COPY conf/app/.env /app/$GIT_PROJECT_NAME/.env
+
+RUN npm install --save
+
+RUN touch /app/app.log
+CMD service ssh start && forever start -o /app/app.log -e app.log node_modules/@angular/cli/bin/ng serve --host 9.9.3.1 > null && tail -f /app/app.log
+#CMD forever start node_modules/@angular/cli/bin/ng serve --host 9.9.3.1 -o /app/app.log -e app.log > null && tail -f /app/app.log
+#CMD ng serve --port 3000 > /app/app.log && tail -f /app/app.log
+
+

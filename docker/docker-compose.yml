@@ -1,0 +1,60 @@
+version: '2'
+
+services:
+        ubuntu_base:
+                build: 
+                        context: .
+                        dockerfile: Dockerfile.msrit.ubuntu_base 
+        jenkins:
+                build:
+                        context: .
+                        dockerfile: Dockerfile.msrit.jenkins
+                ports:
+                        - '8080:8080'
+                tty: true
+                stdin_open: true
+                networks:
+                        connexion-vpc:
+                                ipv4_address: 9.9.2.1
+        mongodb:
+                build:
+                        context: .
+                        dockerfile: Dockerfile.msrit.mongodb
+                ports:
+                        - '27017:27017'
+                tty: true
+                stdin_open: true
+                networks:
+                        connexion-vpc:
+                                ipv4_address: 9.9.2.2
+
+
+        app:   
+                build:
+                      context: .
+                      dockerfile: Dockerfile.msrit.app_setup
+                      args: 
+                           GIT_SERVER_URL: https://github.com 
+                           GIT_PROJECT_GROUP: gmchowdary 
+                           GIT_PROJECT_NAME: dummy-app
+                           GIT_BRANCH: master
+                ports:
+                        - '4200:4200'
+                networks:
+                        connexion-vpc:
+                                ipv4_address: 9.9.3.1
+                tty: true
+                stdin_open: true
+
+
+networks:
+  connexion-vpc:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 9.9.0.0/16
+          gateway: 9.9.0.1
+        
+
+
+

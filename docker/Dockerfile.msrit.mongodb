@@ -1,0 +1,12 @@
+#
+# Mongodb Docker Container
+#
+FROM docker_ubuntu_base
+MAINTAINER Geeth Chowdary "geeth@geethsoft.com"
+
+#Install MongoDB
+RUN apt install mongodb -y
+ADD conf/mongodb/mongodb.conf /etc/mongodb.conf 
+CMD service ssh start && service mongodb start && tail -f /var/log/mongodb/mongodb.log
+#mongo -u username -p password admin --eval "db.getSiblingDB('msr').addUser('msr', 'msr');" && tail -f /var/log/mongodb/mongodb.log
+EXPOSE 27017

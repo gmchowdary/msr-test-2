@@ -1,0 +1,13 @@
+---
+- name: install Package git
+  apt: pkg=git state=installed
+  ignore_errors: true
+
+- name: install Package docker
+  apt: pkg=docker state=installed
+  ignore_errors: true
+
+- name: install Package docker-compose
+  apt: pkg=docker-compose state=installed
+  ignore_errors: true
+

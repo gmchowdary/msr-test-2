@@ -1,0 +1,35 @@
+#
+# Jenkins Docker Container
+#
+FROM docker_ubuntu_base 
+MAINTAINER Geeth Chowdary "geeth@geethsoft.com"
+
+#Install Jenkins dependencies 
+RUN apt update
+RUN apt install daemon  psmisc  net-tools -y
+RUN sudo apt install openjdk-8-jre -y
+#install jenkins
+#RUN wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+#RUN apt update
+#RUN apt install jenkins
+RUN wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+RUN sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+RUN sudo apt-get update
+RUN sudo apt-get install jenkins
+RUN echo jenkins:MSR123 | /usr/sbin/chpasswd
+#install using dpkg
+#RUN cd tmp && wget https://pkg.jenkins.io/debian-stable/binary/jenkins_2.138.1_all.deb && dpkg -i jenkins_2.138.1_all.deb
+WORKDIR /home/jenkins
+EXPOSE 8080
+#Start services
+CMD service jenkins start && service ssh start && tail -f /var/log/jenkins/jenkins.log  
+#	echo 'please copy the below password\n' && \
+#	echo '******************************\n' && \
+#	cat /var/lib/jenkins/secrets/initialAdminPassword && \
+#	echo '******************************\n' &&\
+#	tail -f /var/log/jenkins/jenkins.log
+
+#docker build -t "jenkinsimage" .
+#port to be binded 8080 for jenkins
+#port to be binden 22 for ssh
+

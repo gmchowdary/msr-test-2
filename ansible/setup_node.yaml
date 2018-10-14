@@ -1,0 +1,10 @@
+---
+- name: Install playbooks 
+  hosts: msr  
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  roles:
+    - setup_node
+  vars:
+    ansible_ssh_private_key_file: "../secrets/geeth_test.pem"

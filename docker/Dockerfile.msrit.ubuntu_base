@@ -1,0 +1,13 @@
+#
+# Jenkins Docker Container
+#
+FROM ubuntu:latest
+MAINTAINER Geeth Chowdary "geeth@geethsoft.com"
+#Install some essential softwares for ubuntu
+RUN apt update
+RUN apt install curl vim sudo wget software-properties-common ssh apt-transport-https -y
+#RUN ssh-keygen -f id_rsa -t rsa -N ''
+#RUN ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ''
+RUN useradd jenkins && su - jenkins && mkdir -p /home/jenkins/.ssh && ssh-keygen -q -t rsa -f /home/jenkins/.ssh/id_rsa -N '' && exit
+RUN chown jenkins /home/jenkins -R
+RUN mkdir -p /root/.ssh && touch /root/.ssh/authorized_key && cp /home/jenkins/.ssh/id_rsa.pub /root/.ssh/authorized_keys

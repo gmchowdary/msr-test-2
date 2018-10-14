@@ -1,0 +1,88 @@
+pipeline{
+ agent any
+ stages{
+
+    stage('Status'){
+         steps{
+            echo "HIIIII"            
+        }
+    }
+
+    stage('Stop Server'){
+         steps{
+            sh '''
+            ssh -o "StrictHostKeyChecking no" root@9.9.3.1 << EOF
+                cd /app/dummy-app/
+                forever stop node_modules/@angular/cli/bin/ng
+            EOF
+            server1=$?
+            if [ $server1 == 255 ]
+            then
+                    echo "Unable Establish ssh Connexion"
+                    exit 1
+            elif [ $server1 == 1 ]
+            then
+                    echo "Build Failed"
+                    exit 1
+            else
+                    echo "build success"
+            fi
+            '''
+        }
+    }
+
+    stage('Integrate Code'){
+         steps{
+            sh '''
+            ssh -o "StrictHostKeyChecking no" root@9.9.3.1 << EOF
+                BRANCH=master
+                cd /app/dummy-app/
+                git stash
+                git checkout $BRANCH
+                git pull origin $BRANCH
+            EOF
+            server1=$?
+            if [ $server1 == 255 ]
+            then
+                    echo "Unable Establish ssh Connexion"
+                    exit 1
+            elif [ $server1 == 1 ]
+            then
+                    echo "Build Failed"
+                    exit 1
+            else
+                    echo "build success"
+            fi
+            '''
+        }
+    }
+
+
+    stage('Start Code'){
+    
+         steps{
+            sh '''
+            ssh -o "StrictHostKeyChecking no" root@9.9.3.1 << EOF
+                cd /app/dummy-app/
+                forever start -o /app/app.log -e app.log node_modules/@angular/cli/bin/ng serve --host 9.9.3.1 > null
+            EOF
+            server1=$?
+            if [ $server1 == 255 ]
+            then
+                    echo "Unable Establish ssh Connexion"
+                    exit 1
+            elif [ $server1 == 1 ]
+            then
+                    echo "Build Failed"
+                    exit 1
+            else
+                    echo "build success"
+            fi
+            '''
+        }    
+    }
+
+ }
+}
+
+
